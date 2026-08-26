@@ -1,0 +1,176 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #505050;
+  color: #fff;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.home-bar {
+  display: flex;
+  gap: 12px;
+  padding: 10px;
+  background: #606060;
+}
+
+.page-content {
+  padding: 20px;
+}
+
+.button {
+  border: 0;
+  border-radius: 4px;
+  padding: 8px 12px;
+  background: #e6e6e6;
+  color: #333;
+  cursor: pointer;
+  font: inherit;
+  text-decoration: none;
+}
+
+.button:hover {
+  background: #fff;
+}
+
+.user-area,
+.actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.agenda-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.date-box {
+  flex: 1 1 calc(50% - 6px);
+  min-width: 250px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #505050;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.date-header {
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #0d9276;
+  color: #0d9276;
+  font-weight: 600;
+}
+
+.agenda-item {
+  padding: 6px 0;
+  color: #fff;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.agenda-dialog {
+  width: min(92vw, 460px);
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: #707070;
+  color: #fff;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+.agenda-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.agenda-dialog form {
+  display: grid;
+  gap: 6px;
+  padding: 20px;
+}
+
+.agenda-dialog h2 {
+  margin: 0 0 8px;
+}
+
+.agenda-dialog label,
+.agenda-dialog legend {
+  color: #fff;
+  font-weight: 700;
+}
+
+.agenda-dialog input,
+.agenda-dialog textarea {
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 8px;
+  border: 1px solid #d7dfe8;
+  border-radius: 4px;
+  font: inherit;
+}
+
+.agenda-dialog fieldset {
+  margin: 4px 0 8px;
+  padding: 10px;
+  border: 1px solid #aaa;
+}
+
+.section-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 8px;
+}
+
+.subject-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 16px;
+  margin-top: 8px;
+}
+
+.section-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #fff;
+  font-weight: 400;
+}
+
+.subject-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #fff;
+  font-weight: 400;
+}
+
+.section-option input,
+.subject-option input {
+  width: auto;
+  margin: 0;
+}
+
+.form-error {
+  margin: 8px 0 0;
+  color: #ffb3b3;
+  font-size: 13px;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.secondary-button {
+  background: #ccc;
+}

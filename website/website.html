@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Al-Imam Al-Rida School</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
+</head>
+<body>
+  <nav class="nav" aria-label="Primary navigation">
+    <button id="home" type="button">Home</button>
+  </nav>
+
+  <div id="pageDim" class="page-dim"></div>
+  <aside id="rightPanel" class="right-panel" aria-hidden="true">
+    <div class="panel-header">
+      <strong>School menu</strong>
+      <button id="closePanel" class="close-btn" type="button" aria-label="Close menu">X</button>
+    </div>
+    <div class="panel-body">
+      <a href="../agenda/agenda.html">Agenda</a>
+      <a href="../schedule/schedule.html">Schedule</a>
+    </div>
+    <div class="panel-footer">
+      <button id="panelLogout" class="logout-btn" type="button">Logout</button>
+    </div>
+  </aside>
+
+  <main>
+    <div id="chartContainer" class="chart-container"></div>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

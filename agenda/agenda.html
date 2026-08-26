@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Al-Imam Al-Rida School - Agenda</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav class="home-bar" aria-label="Primary navigation">
+    <a href="../website/website.html" class="button">Home</a>
+  </nav>
+
+  <main class="page-content">
+    <h1>Agenda</h1>
+    <div id="userArea" class="user-area">
+      <span id="userInfo"></span>
+      <button id="logoutBtn" class="button" type="button">Logout</button>
+    </div>
+
+    <div class="actions">
+      <button id="addAgendaBtn" class="button" type="button">Add Agenda</button>
+      <button id="clearBtn" class="button" type="button">Clear Agendas</button>
+    </div>
+    <div id="output" class="agenda-list" aria-live="polite"></div>
+  </main>
+
+  <dialog id="agendaDialog" class="agenda-dialog">
+    <form id="agendaForm" method="dialog">
+      <h2>Add agenda</h2>
+      <fieldset>
+        <legend>Subjects</legend>
+        <div id="subjectOptions" class="subject-options"></div>
+        <p id="subjectError" class="form-error" hidden>Select at least one subject.</p>
+      </fieldset>
+
+      <label for="agendaInput">Agenda</label>
+      <textarea id="agendaInput" name="agenda" rows="4" required></textarea>
+
+      <label for="dateInput">Date</label>
+      <input id="dateInput" name="date" type="date">
+
+      <fieldset>
+        <legend>Sections</legend>
+        <div id="sectionOptions" class="section-options"></div>
+        <p id="sectionError" class="form-error" hidden>Select at least one section.</p>
+      </fieldset>
+
+      <div class="dialog-actions">
+        <button id="cancelAgendaBtn" class="button secondary-button" type="button">Cancel</button>
+        <button class="button" type="submit">Add agenda</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="script.js"></script>
+</body>
+</html>
