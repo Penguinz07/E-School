@@ -30,26 +30,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const loadFromStorage = async () => {
     if (typeof supabaseClient !== 'undefined') {
-      const { data, error } = await supabaseClient
-        .from('agendas')
-        .select('id, agenda, subject, section, agenda_date')
-        .order('agenda_date', { ascending: true });
-      if (!error) {
-        agendasByDate = {};
-        data.forEach((item) => {
-          const date = item.agenda_date || 'No Date';
-          agendasByDate[date] ||= [];
-          agendasByDate[date].push({
-            agenda: item.agenda,
-            session: item.subject,
-            section: item.section
+      try {
+        const { data, error } = await supabaseClient
+          .from('agendas')
+          .select('id, agenda, subject, section, agenda_date')
+          .order('agenda_date', { ascending: true });
+        if (!error) {
+          agendasByDate = {};
+          data.forEach((item) => {
+            const date = item.agenda_date || 'No Date';
+            agendasByDate[date] ||= [];
+            agendasByDate[date].push({
+              agenda: item.agenda,
+              session: item.subject,
+              section: item.section
+            });
           });
-        });
-        storageStatus.textContent = 'Connected: agendas are shared online.';
-        return;
+          storageStatus.textContent = 'Connected: agendas are shared online.';
+          return;
+        }
+        storageStatus.textContent = 'Supabase rejected the request. Check the table and policies.';
+        console.error('Could not load agendas from Supabase:', error.message);
+      } catch (error) {
+        storageStatus.textContent = 'Supabase is unreachable. Check the project URL and your connection.';
+        console.error('Could not connect to Supabase:', error);
       }
-      storageStatus.textContent = 'Supabase table not ready. Showing local agendas.';
-      console.error('Could not load agendas from Supabase:', error.message);
     }
     const stored = localStorage.getItem('agendasByDate');
     if (!stored) return;
@@ -66,19 +71,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const saveToSupabase = async (items) => {
     if (typeof supabaseClient === 'undefined') return false;
-    const { error } = await supabaseClient.from('agendas').insert(items.map((item) => ({
-      agenda: item.agenda,
-      subject: item.session,
-      section: item.section,
-      agenda_date: item.date
-    })));
-    if (error) {
-      storageStatus.textContent = 'Could not save online. Check your Supabase table and policies.';
-      console.error('Could not save agenda:', error.message);
+    try {
+      const { error } = await supabaseClient.from('agendas').insert(items.map((item) => ({
+        agenda: item.agenda,
+        subject: item.session,
+        section: item.section,
+        agenda_date: item.date
+      })));
+      if (error) {
+        storageStatus.textContent = 'Could not save online. Check your Supabase table and policies.';
+        console.error('Could not save agenda:', error.message);
+        return false;
+      }
+      storageStatus.textContent = 'Saved online. Other users can now see this agenda.';
+      return true;
+    } catch (error) {
+      storageStatus.textContent = 'Supabase is unreachable. Agenda saved only on this device.';
+      console.error('Could not connect to Supabase while saving:', error);
       return false;
     }
-    storageStatus.textContent = 'Saved online. Other users can now see this agenda.';
-    return true;
   };
 
   const clearSupabase = async () => {
