@@ -51,6 +51,12 @@ body {
   gap: 12px;
 }
 
+.storage-status {
+  min-height: 20px;
+  color: #c7ffcf;
+  font-size: 13px;
+}
+
 .date-box {
   flex: 1 1 calc(50% - 6px);
   min-width: 250px;

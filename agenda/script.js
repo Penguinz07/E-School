@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const subjectOptions = document.getElementById('subjectOptions');
   const subjectError = document.getElementById('subjectError');
   const cancelAgendaButton = document.getElementById('cancelAgendaBtn');
+  const storageStatus = document.getElementById('storageStatus');
 
   const username = sessionStorage.getItem('username');
   const role = sessionStorage.getItem('role');
@@ -27,7 +28,29 @@ document.addEventListener('DOMContentLoaded', () => {
     ]
   };
 
-  const loadFromStorage = () => {
+  const loadFromStorage = async () => {
+    if (typeof supabaseClient !== 'undefined') {
+      const { data, error } = await supabaseClient
+        .from('agendas')
+        .select('id, agenda, subject, section, agenda_date')
+        .order('agenda_date', { ascending: true });
+      if (!error) {
+        agendasByDate = {};
+        data.forEach((item) => {
+          const date = item.agenda_date || 'No Date';
+          agendasByDate[date] ||= [];
+          agendasByDate[date].push({
+            agenda: item.agenda,
+            session: item.subject,
+            section: item.section
+          });
+        });
+        storageStatus.textContent = 'Connected: agendas are shared online.';
+        return;
+      }
+      storageStatus.textContent = 'Supabase table not ready. Showing local agendas.';
+      console.error('Could not load agendas from Supabase:', error.message);
+    }
     const stored = localStorage.getItem('agendasByDate');
     if (!stored) return;
     try {
@@ -39,6 +62,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const saveToStorage = () => {
     localStorage.setItem('agendasByDate', JSON.stringify(agendasByDate));
+  };
+
+  const saveToSupabase = async (items) => {
+    if (typeof supabaseClient === 'undefined') return false;
+    const { error } = await supabaseClient.from('agendas').insert(items.map((item) => ({
+      agenda: item.agenda,
+      subject: item.session,
+      section: item.section,
+      agenda_date: item.date
+    })));
+    if (error) {
+      storageStatus.textContent = 'Could not save online. Check your Supabase table and policies.';
+      console.error('Could not save agenda:', error.message);
+      return false;
+    }
+    storageStatus.textContent = 'Saved online. Other users can now see this agenda.';
+    return true;
+  };
+
+  const clearSupabase = async () => {
+    if (typeof supabaseClient === 'undefined') return false;
+    const { error } = await supabaseClient.from('agendas').delete().gte('id', 0);
+    if (error) {
+      storageStatus.textContent = 'Could not clear online agendas. Check your Supabase policies.';
+      console.error('Could not clear agendas:', error.message);
+      return false;
+    }
+    storageStatus.textContent = 'Online agendas cleared.';
+    return true;
   };
 
   const getUserSections = () => {
@@ -162,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   cancelAgendaButton.addEventListener('click', () => agendaDialog.close());
 
-  agendaForm.addEventListener('submit', (event) => {
+  agendaForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     const selectedSections = [...agendaForm.querySelectorAll('input[name="sections"]:checked')]
       .map((checkbox) => checkbox.value);
@@ -178,24 +230,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const date = document.getElementById('dateInput').value;
     const dateKey = date || 'No Date';
     agendasByDate[dateKey] ||= [];
+    const newItems = [];
     selectedSections.forEach((section) => {
       selectedSubjects.forEach((subject) => {
-        agendasByDate[dateKey].push({
+        const item = {
           agenda,
           session: subject,
           section
-        });
+        };
+        newItems.push({ ...item, date: dateKey });
+        agendasByDate[dateKey].push(item);
       });
     });
-    saveToStorage();
+    const savedOnline = await saveToSupabase(newItems);
+    if (!savedOnline) saveToStorage();
     renderAgendas();
     agendaDialog.close();
   });
 
-  clearButton.addEventListener('click', () => {
+  clearButton.addEventListener('click', async () => {
     if (!canManageAgendas) return;
+    const clearedOnline = await clearSupabase();
     agendasByDate = {};
-    saveToStorage();
+    if (!clearedOnline) saveToStorage();
     renderAgendas();
   });
 
@@ -204,6 +261,5 @@ document.addEventListener('DOMContentLoaded', () => {
     window.location.href = '../login/login.html';
   });
 
-  loadFromStorage();
-  renderAgendas();
+  loadFromStorage().then(renderAgendas);
 });

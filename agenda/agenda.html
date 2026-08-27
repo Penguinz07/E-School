@@ -22,6 +22,7 @@
       <button id="addAgendaBtn" class="button" type="button">Add Agenda</button>
       <button id="clearBtn" class="button" type="button">Clear Agendas</button>
     </div>
+    <p id="storageStatus" class="storage-status" aria-live="polite"></p>
     <div id="output" class="agenda-list" aria-live="polite"></div>
   </main>
 
@@ -38,7 +39,7 @@
       <textarea id="agendaInput" name="agenda" rows="4" required></textarea>
 
       <label for="dateInput">Date</label>
-      <input id="dateInput" name="date" type="date">
+      <input id="dateInput" name="date" type="date" required>
 
       <fieldset>
         <legend>Sections</legend>
@@ -53,6 +54,8 @@
     </form>
   </dialog>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../supabase-config.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

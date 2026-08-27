@@ -2,8 +2,28 @@ function clearSession() {
   ['loggedIn', 'username', 'role', 'section', 'sections'].forEach((key) => sessionStorage.removeItem(key));
 }
 
-function renderAgendaChart() {
-  const agendasByDate = JSON.parse(localStorage.getItem('agendasByDate') || '{}');
+async function getAgendasByDate() {
+  if (typeof supabaseClient !== 'undefined') {
+    const { data, error } = await supabaseClient
+      .from('agendas')
+      .select('subject, section, agenda_date')
+      .order('agenda_date', { ascending: true });
+    if (!error) {
+      const agendasByDate = {};
+      data.forEach((item) => {
+        const date = item.agenda_date || 'No Date';
+        agendasByDate[date] ||= [];
+        agendasByDate[date].push({ session: item.subject, section: item.section });
+      });
+      return agendasByDate;
+    }
+    console.error('Could not load chart data from Supabase:', error.message);
+  }
+  return JSON.parse(localStorage.getItem('agendasByDate') || '{}');
+}
+
+async function renderAgendaChart() {
+  const agendasByDate = await getAgendasByDate();
   const groups = {};
   Object.entries(agendasByDate).forEach(([date, items]) => {
     groups[date] = [...new Set((items || []).map((item) => item.session).filter(Boolean))];
