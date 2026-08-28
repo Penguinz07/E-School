@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Al-Imam Al-Rida School</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="../panel.css">
   <script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
 </head>
 <body>
   <nav class="nav" aria-label="Primary navigation">
-    <button id="home" type="button">Home</button>
-    <button id="themeToggle" class="theme-toggle" type="button">Light mode</button>
+    <button id="panelToggle" type="button">Home</button>
   </nav>
 
   <div id="pageDim" class="page-dim"></div>
@@ -26,6 +26,9 @@
     </div>
     <div class="panel-footer">
       <button id="panelLogout" class="logout-btn" type="button">Logout</button>
+      <button id="themeToggle" class="theme-toggle" type="button" aria-label="Switch theme">
+        <img src="../Images/sun.png" alt="">
+      </button>
     </div>
   </aside>
 

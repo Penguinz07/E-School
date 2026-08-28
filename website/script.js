@@ -32,6 +32,7 @@ async function renderAgendaChart() {
   const dates = Object.keys(groups).sort();
   const subjects = [...new Set(Object.values(groups).flat())].sort();
   const colors = ['#ff0045', '#00ec9a', '#00e4ff', '#ffa07a', '#040081', '#ffff00', '#0076ff', '#ff0000', '#8c00bf'];
+  const isLight = localStorage.getItem('theme') === 'light';
   const data = subjects.map((subject, index) => ({
     type: 'bar',
     name: subject,
@@ -45,15 +46,17 @@ async function renderAgendaChart() {
 
   new CanvasJS.Chart('chartContainer', {
     animationEnabled: true,
-    backgroundColor: '#505050',
-    theme: 'dark2',
-    title: { text: 'Agendas for the week', fontColor: '#f0f0f0' },
-    axisX: { title: 'Dates', titleFontColor: '#f0f0f0', labelFontColor: '#f0f0f0' },
-    axisY: { title: 'Sessions', titleFontColor: '#f0f0f0', labelFontColor: '#f0f0f0', interval: 1 },
-    legend: { verticalAlign: 'bottom', horizontalAlign: 'center', fontColor: '#fff', cursor: 'pointer' },
+    backgroundColor: isLight ? '#f4f1ea' : '#172a3a',
+    theme: isLight ? 'light2' : 'dark2',
+    title: { text: 'Agendas for the week', fontColor: isLight ? '#222' : '#f0f0f0' },
+    axisX: { title: 'Dates', titleFontColor: isLight ? '#222' : '#f0f0f0', labelFontColor: isLight ? '#222' : '#f0f0f0' },
+    axisY: { title: 'Sessions', titleFontColor: isLight ? '#222' : '#f0f0f0', labelFontColor: isLight ? '#222' : '#f0f0f0', interval: 1 },
+    legend: { verticalAlign: 'bottom', horizontalAlign: 'center', fontColor: isLight ? '#222' : '#fff', cursor: 'pointer' },
     data
   }).render();
 }
+
+window.addEventListener('themechange', renderAgendaChart);
 
 document.addEventListener('DOMContentLoaded', () => {
   const body = document.body;
@@ -63,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
     panel.setAttribute('aria-hidden', 'true');
   };
 
-  document.getElementById('home').addEventListener('click', () => {
+  document.getElementById('panelToggle').addEventListener('click', () => {
     body.classList.toggle('show-right');
     panel.setAttribute('aria-hidden', String(!body.classList.contains('show-right')));
   });

@@ -70,10 +70,18 @@
 
   const button = document.getElementById('themeToggle');
   if (!button) return;
+  const icon = button.querySelector('img');
+  const lightIcon = icon ? icon.src.replace(/sun\.png$/, 'moon.png') : '';
+  const darkIcon = icon ? icon.src : '';
 
   const updateLabel = () => {
     const isLight = document.body.classList.contains('light-theme');
-    button.textContent = isLight ? 'Dark mode' : 'Light mode';
+    if (icon) {
+      icon.src = isLight ? lightIcon : darkIcon;
+      icon.alt = isLight ? 'Switch to dark mode' : 'Switch to light mode';
+    } else {
+      button.textContent = isLight ? 'Dark mode' : 'Light mode';
+    }
     button.setAttribute('aria-label', `Switch to ${isLight ? 'dark' : 'light'} mode`);
   };
 
@@ -83,5 +91,6 @@
     document.body.classList.toggle('light-theme', isLight);
     localStorage.setItem('theme', isLight ? 'light' : 'dark');
     updateLabel();
+    window.dispatchEvent(new Event('themechange'));
   });
 })();

@@ -5,13 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Live Class</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="../panel.css">
 </head>
 <body>
   <nav class="top-bar" aria-label="Primary navigation">
-    <a href="../website/website.html" class="button">Back</a>
-    <a href="../agenda/agenda.html" class="button secondary-button">Agenda</a>
-    <button id="themeToggle" class="theme-toggle" type="button">Light mode</button>
+    <button id="panelToggle" class="button" type="button">Menu</button>
   </nav>
+  <div id="pageDim" class="page-dim"></div>
+  <aside id="rightPanel" class="right-panel" aria-hidden="true"><div class="panel-header"><strong>School menu</strong><button id="closePanel" class="close-btn" type="button">X</button></div><div class="panel-body"><a href="../website/website.html">Home</a><a href="../agenda/agenda.html">Agenda</a><a href="../schedule/schedule.html">Schedule</a><a href="../live-classes/live-classes.html">Live Classes</a></div><div class="panel-footer"><button id="themeToggle" class="theme-toggle" type="button" aria-label="Switch theme"><img src="../Images/sun.png" alt=""></button></div></aside>
 
   <main class="live-page">
     <header class="page-header">
@@ -60,6 +61,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../supabase-config.js"></script>
   <script src="../theme.js"></script>
+  <script src="../panel.js"></script>
   <script src="https://meet.jit.si/external_api.js"></script>
   <script src="script.js"></script>
 </body>

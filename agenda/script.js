@@ -298,7 +298,8 @@ document.addEventListener('DOMContentLoaded', () => {
     output.replaceChildren();
     const userRole = sessionStorage.getItem('role') || '';
     const userSections = getUserSections();
-    const today = new Date().toISOString().slice(0, 10);
+    const currentDate = new Date();
+    const today = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
     const visibleDates = Object.keys(agendasByDate)
       .filter((date) => date !== today)
       .filter((date) => dateFilter.value === 'all' || date === dateFilter.value);
