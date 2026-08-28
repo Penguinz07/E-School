@@ -1,6 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
+  if (sessionStorage.getItem('loggedIn') !== '1') {
+    window.location.href = '../login/login.html';
+    return;
+  }
+
   const role = sessionStorage.getItem('role') || 'student';
-  const username = sessionStorage.getItem('username') || 'Guest';
+  const username = sessionStorage.getItem('username') || 'Student';
   const isHost = role === 'teacher' || role === 'admin';
   const modeText = document.getElementById('modeText');
   const roleBadge = document.getElementById('roleBadge');
