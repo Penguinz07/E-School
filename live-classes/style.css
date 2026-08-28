@@ -88,6 +88,101 @@ h1 {
   background: #0d1822;
 }
 
+.room-directory {
+  display: grid;
+  gap: 24px;
+}
+
+.host-panel {
+  max-width: 620px;
+  padding: 20px;
+  border-left: 3px solid #f2c14e;
+  background: #20394b;
+}
+
+.host-panel h2,
+.room-list-heading h2,
+.classroom-heading h2 {
+  margin: 0;
+  font-weight: 400;
+}
+
+.room-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 14px;
+  margin-top: 16px;
+}
+
+.room-form label {
+  color: #b8c8d0;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 13px;
+}
+
+.room-form input,
+.room-form select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #698395;
+  border-radius: 3px;
+  background: #f7f4ed;
+  color: #172a3a;
+  font: inherit;
+}
+
+.room-form button {
+  justify-self: start;
+  grid-column: 1 / -1;
+  margin-top: 4px;
+}
+
+.room-list-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.room-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 14px;
+}
+
+.room-card {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+  border: 1px solid #385164;
+  background: #20394b;
+}
+
+.room-card h3,
+.room-card p {
+  margin: 0;
+}
+
+.room-card h3 {
+  font-size: 1.25rem;
+  font-weight: 400;
+}
+
+.room-card p {
+  color: #b8c8d0;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 13px;
+}
+
+.classroom-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px;
+  border-bottom: 1px solid #385164;
+}
+
 .meet-frame {
   width: 100%;
   height: min(70vh, 720px);
@@ -116,5 +211,14 @@ h1 {
 
   .meet-frame {
     min-height: 520px;
+  }
+
+  .room-form {
+    grid-template-columns: 1fr;
+  }
+
+  .classroom-heading {
+    align-items: start;
+    flex-direction: column;
   }
 }

@@ -15,14 +15,41 @@
   <main class="live-page">
     <header class="page-header">
       <div>
-        <p class="eyebrow">School broadcast room</p>
+        <p class="eyebrow">Live classroom directory</p>
         <h1>Live Class</h1>
-        <p id="modeText" class="mode-text">Connecting to the classroom...</p>
+        <p id="modeText" class="mode-text">Choose a classroom to join.</p>
       </div>
       <span id="roleBadge" class="role-badge">Loading</span>
     </header>
 
-    <section class="classroom" aria-label="Live classroom">
+    <section id="roomDirectory" class="room-directory" aria-label="Classroom directory">
+      <div id="hostPanel" class="host-panel" hidden>
+        <h2>Create a classroom</h2>
+        <form id="roomForm" class="room-form">
+          <label for="roomNameInput">Classroom name</label>
+          <input id="roomNameInput" name="roomName" type="text" placeholder="Math with Mr Smith" required maxlength="60">
+          <label for="sessionInput">Session</label>
+          <input id="sessionInput" name="session" type="text" placeholder="Math" required maxlength="40">
+          <label for="roomSectionInput">Section</label>
+          <select id="roomSectionInput" name="section" required></select>
+          <button class="button" type="submit">Create classroom</button>
+        </form>
+      </div>
+      <div class="room-list-heading">
+        <h2>Available classrooms</h2>
+        <button id="refreshRooms" class="button secondary-button" type="button">Refresh</button>
+      </div>
+      <div id="roomList" class="room-list" aria-live="polite"></div>
+    </section>
+
+    <section id="classroom" class="classroom" aria-label="Live classroom" hidden>
+      <div class="classroom-heading">
+        <div>
+          <p class="eyebrow">Now viewing</p>
+          <h2 id="activeRoomName">Classroom</h2>
+        </div>
+        <button id="leaveRoom" class="button secondary-button" type="button">Back to classrooms</button>
+      </div>
       <div id="meet" class="meet-frame"></div>
       <p id="status" class="status" aria-live="polite">Preparing the classroom...</p>
     </section>
