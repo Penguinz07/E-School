@@ -17,6 +17,23 @@ body {
   font-weight: 700;
 }
 
+.schedule-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.theme-toggle {
+  padding: 7px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #707070;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+}
+
 main {
   overflow-x: auto;
 }
@@ -36,6 +53,10 @@ main {
   background: #606060;
 }
 
+.today-column {
+  border-color: #f2c14e;
+}
+
 .day-col h2 {
   margin: 6px 0 8px;
   color: #eee;
@@ -52,6 +73,27 @@ main {
   color: #eee;
   font-weight: 700;
   text-align: center;
+}
+
+.session-box::after {
+  display: block;
+  margin-top: 4px;
+  color: #ccc;
+  content: attr(data-time);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.current-session {
+  border: 2px solid #f2c14e;
+  background: #a57918;
+  color: #fff;
+  box-shadow: 0 0 0 2px rgba(242, 193, 78, .25);
+}
+
+.schedule-hint {
+  color: #ddd;
+  font-size: 13px;
 }
 
 .user-info {

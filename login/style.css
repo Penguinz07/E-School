@@ -9,6 +9,12 @@ body {
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
+.login-theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+}
+
 .login-shell {
   min-height: 100vh;
   display: grid;

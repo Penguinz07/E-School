@@ -9,6 +9,7 @@
 <body>
   <nav class="home-bar" aria-label="Primary navigation">
     <a href="../website/website.html" class="button">Home</a>
+    <button id="themeToggle" class="theme-toggle" type="button">Light mode</button>
   </nav>
 
   <main class="page-content">
@@ -21,13 +22,27 @@
     <div class="actions">
       <button id="addAgendaBtn" class="button" type="button">Add Agenda</button>
     </div>
+    <div class="agenda-filters" aria-label="Filter agendas">
+      <label for="dateFilter">Date</label>
+      <select id="dateFilter">
+        <option value="all">All dates</option>
+      </select>
+      <label for="sectionFilter">Section</label>
+      <select id="sectionFilter">
+        <option value="all">All sections</option>
+      </select>
+      <label for="subjectFilter">Subject</label>
+      <select id="subjectFilter">
+        <option value="all">All subjects</option>
+      </select>
+    </div>
     <p id="storageStatus" class="storage-status" aria-live="polite"></p>
     <div id="output" class="agenda-list" aria-live="polite"></div>
   </main>
 
   <dialog id="agendaDialog" class="agenda-dialog">
     <form id="agendaForm" method="dialog">
-      <h2>Add agenda</h2>
+      <h2 id="agendaDialogTitle">Add agenda</h2>
       <fieldset>
         <legend>Subjects</legend>
         <div id="subjectOptions" class="subject-options"></div>
@@ -48,13 +63,14 @@
 
       <div class="dialog-actions">
         <button id="cancelAgendaBtn" class="button secondary-button" type="button">Cancel</button>
-        <button class="button" type="submit">Add agenda</button>
+        <button id="saveAgendaButton" class="button" type="submit">Add agenda</button>
       </div>
     </form>
   </dialog>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../supabase-config.js"></script>
+  <script src="../theme.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

@@ -11,6 +11,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const subjectError = document.getElementById('subjectError');
   const cancelAgendaButton = document.getElementById('cancelAgendaBtn');
   const storageStatus = document.getElementById('storageStatus');
+  const agendaDialogTitle = document.getElementById('agendaDialogTitle');
+  const saveAgendaButton = document.getElementById('saveAgendaButton');
+  const dateFilter = document.getElementById('dateFilter');
+  const sectionFilter = document.getElementById('sectionFilter');
+  const subjectFilter = document.getElementById('subjectFilter');
 
   const username = sessionStorage.getItem('username');
   const role = sessionStorage.getItem('role');
@@ -26,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ]
   };
   let completionNamesByAgendaId = {};
+  let editingItem;
 
   const completionStorageKey = (item) => `agenda-completion:${item.id || `${item.agenda}|${item.session}|${item.section}|${item.date || ''}`}`;
 
@@ -66,7 +72,8 @@ document.addEventListener('DOMContentLoaded', () => {
               id: item.id,
               agenda: item.agenda,
               session: item.subject,
-              section: item.section
+              section: item.section,
+              date
             });
           });
           storageStatus.textContent = 'Connected: agendas are shared online.';
@@ -176,6 +183,30 @@ document.addEventListener('DOMContentLoaded', () => {
     renderAgendas();
   };
 
+  const updateAgenda = async (item, date, values) => {
+    if (item.id && typeof supabaseClient !== 'undefined') {
+      const { error } = await supabaseClient.from('agendas').update({
+        agenda: values.agenda,
+        subject: values.session,
+        section: values.section,
+        agenda_date: values.date
+      }).eq('id', item.id);
+      if (error) {
+        storageStatus.textContent = 'Could not edit online agenda. Check your Supabase policies.';
+        console.error('Could not edit agenda:', error.message);
+        return false;
+      }
+    }
+    const list = agendasByDate[date] || [];
+    const index = list.indexOf(item);
+    if (index === -1) return false;
+    list.splice(index, 1);
+    agendasByDate[values.date] ||= [];
+    agendasByDate[values.date].push({ ...item, agenda: values.agenda, session: values.session, section: values.section, date: values.date });
+    saveToStorage();
+    return true;
+  };
+
   const clearSupabase = async () => {
     if (typeof supabaseClient === 'undefined') return false;
     const { error } = await supabaseClient.from('agendas').delete().gte('id', 0);
@@ -267,8 +298,25 @@ document.addEventListener('DOMContentLoaded', () => {
     output.replaceChildren();
     const userRole = sessionStorage.getItem('role') || '';
     const userSections = getUserSections();
+    const today = new Date().toISOString().slice(0, 10);
+    const visibleDates = Object.keys(agendasByDate)
+      .filter((date) => date !== today)
+      .filter((date) => dateFilter.value === 'all' || date === dateFilter.value);
 
-    for (const date of Object.keys(agendasByDate).sort()) {
+    const allItems = Object.values(agendasByDate).flat();
+    const dates = [...new Set(Object.keys(agendasByDate).filter((date) => date !== today))].sort();
+    const sections = [...new Set(allItems.flatMap((item) => item.section.split(',').map((section) => section.trim().toUpperCase())))].sort();
+    const subjects = [...new Set(allItems.map((item) => item.session).filter(Boolean))].sort();
+    const updateOptions = (select, values, label) => {
+      const current = select.value;
+      select.replaceChildren(new Option(label, 'all'), ...values.map((value) => new Option(value, value)));
+      select.value = values.includes(current) ? current : 'all';
+    };
+    updateOptions(dateFilter, dates, 'All dates');
+    updateOptions(sectionFilter, sections, 'All sections');
+    updateOptions(subjectFilter, subjects, 'All subjects');
+
+    for (const date of visibleDates.sort()) {
       const dateBox = document.createElement('section');
       dateBox.className = 'date-box';
       const header = document.createElement('div');
@@ -282,6 +330,8 @@ document.addEventListener('DOMContentLoaded', () => {
           .map((section) => section.trim().toUpperCase())
           .filter(Boolean);
         if (userRole !== 'admin' && userSections.length && !itemSections.some((section) => userSections.includes(section))) continue;
+        if (sectionFilter.value !== 'all' && !itemSections.includes(sectionFilter.value)) continue;
+        if (subjectFilter.value !== 'all' && item.session !== subjectFilter.value) continue;
 
         const itemElement = document.createElement('div');
         itemElement.className = 'agenda-item';
@@ -319,6 +369,12 @@ document.addEventListener('DOMContentLoaded', () => {
           controls.appendChild(completedText);
         }
         if (canManageAgendas) {
+          const editButton = document.createElement('button');
+          editButton.className = 'edit-agenda-button';
+          editButton.type = 'button';
+          editButton.textContent = 'Edit';
+          editButton.addEventListener('click', () => openEditDialog(item, date));
+          controls.appendChild(editButton);
           const deleteButton = document.createElement('button');
           deleteButton.className = 'delete-agenda-button';
           deleteButton.type = 'button';
@@ -334,9 +390,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  const openEditDialog = (item, date) => {
+    editingItem = { item, date };
+    agendaDialogTitle.textContent = 'Edit agenda';
+    saveAgendaButton.textContent = 'Save changes';
+    document.getElementById('agendaInput').value = item.agenda;
+    document.getElementById('dateInput').value = item.date || date;
+    agendaForm.querySelectorAll('input[name="sections"]').forEach((checkbox) => {
+      checkbox.checked = item.section.split(',').map((section) => section.trim()).includes(checkbox.value);
+    });
+    agendaForm.querySelectorAll('input[name="subjects"]').forEach((checkbox) => {
+      checkbox.checked = checkbox.value === item.session;
+    });
+    sectionError.hidden = true;
+    subjectError.hidden = true;
+    agendaDialog.showModal();
+  };
+
   addButton.addEventListener('click', () => {
     if (!canManageAgendas) return;
     agendaForm.reset();
+    editingItem = undefined;
+    agendaDialogTitle.textContent = 'Add agenda';
+    saveAgendaButton.textContent = 'Add agenda';
     sectionError.hidden = true;
     subjectError.hidden = true;
     agendaDialog.showModal();
@@ -359,6 +435,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const agenda = document.getElementById('agendaInput').value.trim();
     const date = document.getElementById('dateInput').value;
     const dateKey = date || 'No Date';
+    if (editingItem) {
+      const values = { agenda, date: dateKey, session: selectedSubjects[0], section: selectedSections.join(',') };
+      const updated = await updateAgenda(editingItem.item, editingItem.date, values);
+      if (updated) {
+        editingItem = undefined;
+        agendaDialog.close();
+        renderAgendas();
+      }
+      return;
+    }
     agendasByDate[dateKey] ||= [];
     const newItems = [];
     selectedSections.forEach((section) => {
@@ -382,6 +468,8 @@ document.addEventListener('DOMContentLoaded', () => {
     ['loggedIn', 'username', 'role', 'section', 'sections'].forEach((key) => sessionStorage.removeItem(key));
     window.location.href = '../login/login.html';
   });
+
+  [dateFilter, sectionFilter, subjectFilter].forEach((filter) => filter.addEventListener('change', renderAgendas));
 
   loadFromStorage().then(renderAgendas);
 });

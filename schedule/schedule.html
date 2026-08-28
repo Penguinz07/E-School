@@ -7,13 +7,18 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <a href="../website/website.html" class="home-link">Home</a>
+  <nav class="schedule-nav">
+    <a href="../website/website.html" class="home-link">Home</a>
+    <button id="themeToggle" class="theme-toggle" type="button">Light mode</button>
+  </nav>
   <main>
     <h1>Schedule</h1>
     <label for="sectionSelect">Section</label>
     <select id="sectionSelect" aria-label="Select section"></select>
+    <p class="schedule-hint">The highlighted lesson is the current session.</p>
     <div id="columns" class="columns" aria-live="polite"></div>
   </main>
+  <script src="../theme.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

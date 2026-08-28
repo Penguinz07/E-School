@@ -1,4 +1,13 @@
 const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+const periodTimes = [
+  ['08:00', '08:45'],
+  ['08:45', '09:30'],
+  ['09:30', '10:15'],
+  ['10:15', '11:00'],
+  ['11:00', '11:45'],
+  ['11:45', '12:30'],
+  ['12:30', '13:15']
+];
 const schedules = {
   '8A': [
     ['Robotics', 'Math', 'Arabic', 'History', 'Physics', 'English'],
@@ -66,15 +75,26 @@ const columns = document.getElementById('columns');
 function renderSchedule(selectedSection) {
   columns.replaceChildren();
   info.textContent = `User: ${username}   Section: ${selectedSection}`;
+  const now = new Date();
+  const todayIndex = now.getDay() - 1;
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const currentPeriod = periodTimes.findIndex(([start, end]) => {
+    const toMinutes = (value) => Number(value.slice(0, 2)) * 60 + Number(value.slice(3));
+    return currentMinutes >= toMinutes(start) && currentMinutes < toMinutes(end);
+  });
   schedules[selectedSection].forEach((sessions, dayIndex) => {
   const column = document.createElement('section');
   column.className = 'day-col';
+  if (dayIndex === todayIndex) column.classList.add('today-column');
   const heading = document.createElement('h2');
   heading.textContent = dayNames[dayIndex];
   column.appendChild(heading);
-  sessions.forEach((session) => {
+  sessions.forEach((session, periodIndex) => {
     const sessionBox = document.createElement('div');
     sessionBox.className = 'session-box';
+    if (dayIndex === todayIndex && periodIndex === currentPeriod) sessionBox.classList.add('current-session');
+    const time = periodTimes[periodIndex];
+    if (time) sessionBox.dataset.time = `${time[0]}-${time[1]}`;
     sessionBox.textContent = session;
     column.appendChild(sessionBox);
   });

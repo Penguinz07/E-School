@@ -12,9 +12,21 @@ body {
 
 .home-bar {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 12px;
   padding: 10px;
   background: #606060;
+}
+
+.theme-toggle {
+  padding: 7px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #707070;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
 }
 
 .page-content {
@@ -37,12 +49,35 @@ body {
 }
 
 .user-area,
-.actions {
+.actions,
+.agenda-filters {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 12px;
+}
+
+.agenda-filters {
+  margin: 16px 0;
+}
+
+.agenda-filters label {
+  font-size: 13px;
+}
+
+.agenda-filters select {
+  padding: 7px 9px;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  background: #707070;
+  color: #fff;
+  font: inherit;
+}
+
+body.light-theme .agenda-filters select {
+  background: #fff;
+  color: #222;
 }
 
 .agenda-list {
@@ -121,6 +156,17 @@ body {
 
 .delete-agenda-button:hover {
   background: #ef6a66;
+}
+
+.edit-agenda-button {
+  padding: 5px 9px;
+  border: 0;
+  border-radius: 4px;
+  background: #0d9276;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
 }
 
 .agenda-dialog {
