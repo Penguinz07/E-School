@@ -23,6 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const activeRoomName = document.getElementById('activeRoomName');
   let rooms = [];
   let api;
+  let activeRoom;
+  let roomStatusTimer;
 
   roleBadge.textContent = isHost ? `${role} host` : 'student viewer';
   modeText.textContent = isHost
@@ -82,9 +84,42 @@ document.addEventListener('DOMContentLoaded', () => {
       joinButton.type = 'button';
       joinButton.textContent = 'Join classroom';
       joinButton.addEventListener('click', () => joinRoom(room));
-      card.append(title, details, joinButton);
+      const actions = document.createElement('div');
+      actions.className = 'room-card-actions';
+      actions.appendChild(joinButton);
+      if (isHost) {
+        const endButton = document.createElement('button');
+        endButton.className = 'button danger-button';
+        endButton.type = 'button';
+        endButton.textContent = 'End session';
+        endButton.addEventListener('click', () => endRoom(room));
+        actions.appendChild(endButton);
+      }
+      card.append(title, details, actions);
       roomList.appendChild(card);
     });
+  };
+
+  const endRoom = async (room) => {
+    if (!window.confirm(`End "${room.room_name}" for everyone?`)) return;
+    const { error } = await supabaseClient
+      .from('live_classrooms')
+      .delete()
+      .eq('id', room.id);
+    if (error) {
+      status.textContent = 'Could not end the session. Check your Supabase delete policy.';
+      console.error('Could not end classroom:', error.message);
+      return;
+    }
+    if (activeRoom && activeRoom.id === room.id) {
+      if (api) api.dispose();
+      clearInterval(roomStatusTimer);
+      activeRoom = undefined;
+      classroom.hidden = true;
+      roomDirectory.hidden = false;
+    }
+    status.textContent = 'Session ended.';
+    await loadRooms();
   };
 
   const joinRoom = (room) => {
@@ -94,6 +129,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     roomDirectory.hidden = true;
     classroom.hidden = false;
+    activeRoom = room;
+    clearInterval(roomStatusTimer);
     activeRoomName.textContent = room.room_name;
     meet.replaceChildren();
     const toolbarButtons = isHost
@@ -123,6 +160,22 @@ document.addEventListener('DOMContentLoaded', () => {
         ? 'You are live. Use the screen button to present.'
         : 'Connected. The teacher’s screen will appear here.';
     });
+    roomStatusTimer = setInterval(async () => {
+      const { data } = await supabaseClient
+        .from('live_classrooms')
+        .select('id')
+        .eq('id', room.id)
+        .maybeSingle();
+      if (!data) {
+        clearInterval(roomStatusTimer);
+        if (api) api.dispose();
+        activeRoom = undefined;
+        classroom.hidden = true;
+        roomDirectory.hidden = false;
+        status.textContent = 'The host ended this session.';
+        await loadRooms();
+      }
+    }, 10000);
   };
 
   roomForm.addEventListener('submit', async (event) => {
@@ -151,6 +204,8 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('refreshRooms').addEventListener('click', loadRooms);
   document.getElementById('leaveRoom').addEventListener('click', () => {
     if (api) api.dispose();
+    clearInterval(roomStatusTimer);
+    activeRoom = undefined;
     classroom.hidden = true;
     roomDirectory.hidden = false;
     status.textContent = 'Choose a classroom to join.';
