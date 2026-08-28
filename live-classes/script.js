@@ -142,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
     meet.replaceChildren();
     const toolbarButtons = isHost
       ? ['microphone', 'camera', 'desktop', 'chat', 'raisehand', 'tileview', 'fullscreen']
-      : ['fullscreen'];
+      : ['microphone', 'fullscreen'];
     api = new JitsiMeetExternalAPI('meet.jit.si', {
       roomName: roomKey(room),
       parentNode: meet,
