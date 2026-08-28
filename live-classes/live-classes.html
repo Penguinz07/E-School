@@ -30,8 +30,9 @@
           <input id="roomNameInput" name="roomName" type="text" placeholder="Math with Mr Smith" required maxlength="60">
           <label for="sessionInput">Session</label>
           <input id="sessionInput" name="session" type="text" placeholder="Math" required maxlength="40">
-          <label for="roomSectionInput">Section</label>
-          <select id="roomSectionInput" name="section" required></select>
+          <label for="roomSectionInput">Sections</label>
+          <select id="roomSectionInput" name="sections" multiple required></select>
+          <p class="field-help">Hold Ctrl or Command to choose more than one section.</p>
           <button class="button" type="submit">Create classroom</button>
         </form>
       </div>

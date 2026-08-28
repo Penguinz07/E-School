@@ -65,9 +65,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const renderRooms = () => {
     roomList.replaceChildren();
-    const visibleRooms = isHost
-      ? rooms.filter((room) => userSections.includes(room.section))
-      : rooms.filter((room) => userSections.includes(room.section));
+    const visibleRooms = rooms.filter((room) => room.section
+      .split(',')
+      .map((section) => section.trim())
+      .some((section) => userSections.includes(section)));
     if (!visibleRooms.length) {
       showStatus(isHost ? 'Create a classroom to get started.' : 'No classrooms are available for your sections.');
       return;
@@ -78,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const title = document.createElement('h3');
       title.textContent = room.room_name;
       const details = document.createElement('p');
-      details.textContent = `${room.session} | Section ${room.section}`;
+      details.textContent = `${room.session} | Sections ${room.section}`;
       const joinButton = document.createElement('button');
       joinButton.className = 'button';
       joinButton.type = 'button';
@@ -135,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
     meet.replaceChildren();
     const toolbarButtons = isHost
       ? ['microphone', 'camera', 'desktop', 'chat', 'raisehand', 'tileview', 'fullscreen']
-      : ['fullscreen', 'tileview'];
+      : ['fullscreen'];
     api = new JitsiMeetExternalAPI('meet.jit.si', {
       roomName: roomKey(room),
       parentNode: meet,
@@ -145,7 +146,9 @@ document.addEventListener('DOMContentLoaded', () => {
       configOverwrite: {
         prejoinPageEnabled: false,
         startWithAudioMuted: !isHost,
-        startWithVideoMuted: true
+        startWithVideoMuted: true,
+        disableTileView: !isHost,
+        filmstrip: { disable: !isHost }
       },
       interfaceConfigOverwrite: {
         TOOLBAR_BUTTONS: toolbarButtons,
@@ -183,7 +186,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const formData = new FormData(roomForm);
     const roomName = formData.get('roomName').trim();
     const session = formData.get('session').trim();
-    const section = formData.get('section');
+    const sections = formData.getAll('sections');
+    const section = sections.join(',');
     const slug = roomName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
     const { error } = await supabaseClient.from('live_classrooms').insert({
       room_name: roomName,

@@ -131,6 +131,18 @@ h1 {
   font: inherit;
 }
 
+.room-form select[multiple] {
+  min-height: 96px;
+}
+
+.field-help {
+  grid-column: 1 / -1;
+  margin: -4px 0 0;
+  color: #b8c8d0;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 12px;
+}
+
 .room-form button {
   justify-self: start;
   grid-column: 1 / -1;
