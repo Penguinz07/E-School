@@ -4,12 +4,18 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  const role = sessionStorage.getItem('role') || 'student';
+  const role = (sessionStorage.getItem('role') || 'student').toLowerCase();
   const username = sessionStorage.getItem('username') || 'Student';
   const isHost = role === 'teacher' || role === 'admin';
+  let storedSections = [];
+  try {
+    storedSections = JSON.parse(sessionStorage.getItem('sections') || '[]');
+  } catch {
+    storedSections = [];
+  }
   const userSections = role === 'admin'
     ? ['8A', '8B', '8C', '8D']
-    : (JSON.parse(sessionStorage.getItem('sections') || '[]'));
+    : (Array.isArray(storedSections) ? storedSections : []);
   const modeText = document.getElementById('modeText');
   const roleBadge = document.getElementById('roleBadge');
   const status = document.getElementById('status');
@@ -183,21 +189,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
   roomForm.addEventListener('submit', async (event) => {
     event.preventDefault();
+    if (!isHost) return;
     const formData = new FormData(roomForm);
     const roomName = formData.get('roomName').trim();
     const session = formData.get('session').trim();
     const sections = formData.getAll('sections');
+    if (!roomName || !session || !sections.length) {
+      status.textContent = 'Enter a classroom name, session, and at least one section.';
+      return;
+    }
     const section = sections.join(',');
     const slug = roomName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-    const { error } = await supabaseClient.from('live_classrooms').insert({
-      room_name: roomName,
-      session,
-      section,
-      room_key: `${slug || 'classroom'}-${section}-${Date.now()}`
-    });
-    if (error) {
-      status.textContent = 'Could not create the classroom. Check the Supabase table and policies.';
-      console.error('Could not create classroom:', error.message);
+    try {
+      const { error } = await supabaseClient.from('live_classrooms').insert({
+        room_name: roomName,
+        session,
+        section,
+        room_key: `${slug || 'classroom'}-${section}-${Date.now()}`
+      });
+      if (error) throw error;
+    } catch (error) {
+      status.textContent = `Could not create the classroom: ${error.message || 'check Supabase table and policies.'}`;
+      console.error('Could not create classroom:', error);
       return;
     }
     roomForm.reset();
