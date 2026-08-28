@@ -40,6 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
     interfaceConfigOverwrite: {
       TOOLBAR_BUTTONS: toolbarButtons,
       SHOW_JITSI_WATERMARK: false,
+      SHOW_BRAND_WATERMARK: false,
+      SHOW_POWERED_BY: false,
       MOBILE_APP_PROMO: false
     }
   });
