@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
   const addButton = document.getElementById('addAgendaBtn');
-  const clearButton = document.getElementById('clearBtn');
   const output = document.getElementById('output');
   const userInfo = document.getElementById('userInfo');
   const logoutButton = document.getElementById('logoutBtn');
@@ -19,13 +18,36 @@ document.addEventListener('DOMContentLoaded', () => {
   userInfo.textContent = username ? `Signed in: ${username}${role ? ` (${role})` : ''}` : 'Not signed in';
   logoutButton.hidden = !username;
   addButton.hidden = !canManageAgendas;
-  clearButton.hidden = !canManageAgendas;
 
   let agendasByDate = {
     date: [
       { agenda: 'read chapter 3...', session: 'English', section: '8C' },
       { agenda: 'worksheet on...', session: 'Math', section: '8C' }
     ]
+  };
+  let completionNamesByAgendaId = {};
+
+  const completionStorageKey = (item) => `agenda-completion:${item.id || `${item.agenda}|${item.session}|${item.section}|${item.date || ''}`}`;
+
+  const loadCompletions = async () => {
+    if (typeof supabaseClient !== 'undefined') {
+      try {
+        const { data, error } = await supabaseClient
+          .from('agenda_completions')
+          .select('agenda_id, username');
+        if (!error) {
+          completionNamesByAgendaId = {};
+          data.forEach((item) => {
+            completionNamesByAgendaId[item.agenda_id] ||= [];
+            completionNamesByAgendaId[item.agenda_id].push(item.username);
+          });
+          return;
+        }
+        console.error('Could not load agenda completions:', error.message);
+      } catch (error) {
+        console.error('Could not connect to Supabase for completions:', error);
+      }
+    }
   };
 
   const loadFromStorage = async () => {
@@ -41,12 +63,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const date = item.agenda_date || 'No Date';
             agendasByDate[date] ||= [];
             agendasByDate[date].push({
+              id: item.id,
               agenda: item.agenda,
               session: item.subject,
               section: item.section
             });
           });
           storageStatus.textContent = 'Connected: agendas are shared online.';
+          await loadCompletions();
           return;
         }
         storageStatus.textContent = 'Supabase rejected the request. Check the table and policies.';
@@ -57,12 +81,16 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
     const stored = localStorage.getItem('agendasByDate');
-    if (!stored) return;
+    if (!stored) {
+      await loadCompletions();
+      return;
+    }
     try {
       agendasByDate = JSON.parse(stored) || {};
     } catch {
       agendasByDate = {};
     }
+    await loadCompletions();
   };
 
   const saveToStorage = () => {
@@ -72,17 +100,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const saveToSupabase = async (items) => {
     if (typeof supabaseClient === 'undefined') return false;
     try {
-      const { error } = await supabaseClient.from('agendas').insert(items.map((item) => ({
+      const { data, error } = await supabaseClient.from('agendas').insert(items.map((item) => ({
         agenda: item.agenda,
         subject: item.session,
         section: item.section,
         agenda_date: item.date
-      })));
+      }))).select('id');
       if (error) {
         storageStatus.textContent = 'Could not save online. Check your Supabase table and policies.';
         console.error('Could not save agenda:', error.message);
         return false;
       }
+      data.forEach((item, index) => { items[index].id = item.id; });
       storageStatus.textContent = 'Saved online. Other users can now see this agenda.';
       return true;
     } catch (error) {
@@ -90,6 +119,61 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error('Could not connect to Supabase while saving:', error);
       return false;
     }
+  };
+
+  const setAgendaCompletion = async (item, completed) => {
+    const username = sessionStorage.getItem('username') || 'Student';
+    const localKey = completionStorageKey(item);
+    if (completed) {
+      localStorage.setItem(localKey, '1');
+    } else {
+      localStorage.removeItem(localKey);
+    }
+
+    if (!item.id || typeof supabaseClient === 'undefined') return true;
+    try {
+      if (completed) {
+        const { error } = await supabaseClient.from('agenda_completions').upsert({
+          agenda_id: item.id,
+          username
+        }, { onConflict: 'agenda_id,username' });
+        if (error) throw error;
+      } else {
+        const { error } = await supabaseClient
+          .from('agenda_completions')
+          .delete()
+          .eq('agenda_id', item.id)
+          .eq('username', username);
+        if (error) throw error;
+      }
+      const { data } = await supabaseClient
+        .from('agenda_completions')
+        .select('agenda_id, username')
+        .eq('agenda_id', item.id);
+      completionNamesByAgendaId[item.id] = (data || []).map((entry) => entry.username);
+      return true;
+    } catch (error) {
+      storageStatus.textContent = 'Saved on this device. Create the agenda_completions table to share status.';
+      console.error('Could not save agenda completion:', error.message || error);
+      return false;
+    }
+  };
+
+  const deleteAgenda = async (item, date) => {
+    if (item.id && typeof supabaseClient !== 'undefined') {
+      try {
+        const { error } = await supabaseClient.from('agendas').delete().eq('id', item.id);
+        if (error) throw error;
+      } catch (error) {
+        storageStatus.textContent = 'Could not delete online agenda. Check your Supabase policies.';
+        console.error('Could not delete agenda:', error.message || error);
+        return;
+      }
+    }
+    agendasByDate[date] = (agendasByDate[date] || []).filter((entry) => entry !== item);
+    if (!agendasByDate[date].length) delete agendasByDate[date];
+    saveToStorage();
+    renderAgendas();
   };
 
   const clearSupabase = async () => {
@@ -208,6 +292,41 @@ document.addEventListener('DOMContentLoaded', () => {
           noteElement.textContent = ` (${notes.join(' - ')})`;
           itemElement.appendChild(noteElement);
         }
+        const controls = document.createElement('div');
+        controls.className = 'agenda-controls';
+        if (userRole !== 'teacher' && userRole !== 'admin') {
+          const doneLabel = document.createElement('label');
+          doneLabel.className = 'done-control';
+          const doneCheckbox = document.createElement('input');
+          doneCheckbox.type = 'checkbox';
+          doneCheckbox.checked = (item.id && (completionNamesByAgendaId[item.id] || []).includes(username))
+            || localStorage.getItem(completionStorageKey(item)) === '1';
+          doneCheckbox.addEventListener('change', async () => {
+            doneCheckbox.disabled = true;
+            await setAgendaCompletion(item, doneCheckbox.checked);
+            doneCheckbox.disabled = false;
+            renderAgendas();
+          });
+          doneLabel.append(doneCheckbox, ' Done');
+          controls.appendChild(doneLabel);
+        } else {
+          const completedBy = completionNamesByAgendaId[item.id] || [];
+          const completedText = document.createElement('span');
+          completedText.className = 'completed-by';
+          completedText.textContent = completedBy.length
+            ? `Done by: ${completedBy.join(', ')}`
+            : 'Not completed yet';
+          controls.appendChild(completedText);
+        }
+        if (canManageAgendas) {
+          const deleteButton = document.createElement('button');
+          deleteButton.className = 'delete-agenda-button';
+          deleteButton.type = 'button';
+          deleteButton.textContent = 'Delete';
+          deleteButton.addEventListener('click', () => deleteAgenda(item, date));
+          controls.appendChild(deleteButton);
+        }
+        itemElement.appendChild(controls);
         dateBox.appendChild(itemElement);
       }
 
@@ -257,14 +376,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!savedOnline) saveToStorage();
     renderAgendas();
     agendaDialog.close();
-  });
-
-  clearButton.addEventListener('click', async () => {
-    if (!canManageAgendas) return;
-    const clearedOnline = await clearSupabase();
-    agendasByDate = {};
-    if (!clearedOnline) saveToStorage();
-    renderAgendas();
   });
 
   logoutButton.addEventListener('click', () => {

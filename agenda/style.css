@@ -82,6 +82,47 @@ body {
   line-height: 1.4;
 }
 
+.agenda-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+.done-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 600;
+}
+
+.done-control input {
+  width: auto;
+  margin: 0;
+}
+
+.completed-by {
+  color: #c7ffcf;
+}
+
+.delete-agenda-button {
+  margin-left: auto;
+  padding: 5px 9px;
+  border: 0;
+  border-radius: 4px;
+  background: #d9534f;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+}
+
+.delete-agenda-button:hover {
+  background: #ef6a66;
+}
+
 .agenda-dialog {
   width: min(92vw, 460px);
   padding: 0;

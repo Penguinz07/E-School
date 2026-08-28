@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  const roomName = 'LiveClass';
+  const roomName = 'Classroom';
   const toolbarButtons = isHost
     ? ['microphone', 'camera', 'desktop', 'chat', 'raisehand', 'tileview', 'fullscreen']
     : ['fullscreen', 'tileview'];
