@@ -17,6 +17,7 @@ body {
 }
 
 .nav button,
+.nav-link,
 .close-btn,
 .logout-btn {
   border: 0;
@@ -29,6 +30,14 @@ body {
   border-radius: 4px;
   background: #e6e6e6;
   color: #333;
+}
+
+.nav-link {
+  padding: 6px 10px;
+  border-radius: 4px;
+  background: #e6e6e6;
+  color: #333;
+  text-decoration: none;
 }
 
 .right-panel {
