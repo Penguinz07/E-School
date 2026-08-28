@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  const roomName = 'EschoolAlImamAlRidaLiveClass';
+  const roomName = 'LiveClass';
   const toolbarButtons = isHost
     ? ['microphone', 'camera', 'desktop', 'chat', 'raisehand', 'tileview', 'fullscreen']
     : ['fullscreen', 'tileview'];
