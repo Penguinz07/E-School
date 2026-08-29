@@ -467,5 +467,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   [dateFilter, sectionFilter, subjectFilter].forEach((filter) => filter.addEventListener('change', renderAgendas));
 
+  logoutButton.addEventListener('click', () => {
+    sessionStorage.clear();
+    window.location.href = '../login/login.html';
+  });
+
+  const logoutBtnPanel = document.getElementById('logoutBtnPanel');
+  if (logoutBtnPanel) {
+    logoutBtnPanel.addEventListener('click', () => {
+      sessionStorage.clear();
+      window.location.href = '../login/login.html';
+    });
+  }
+
   loadFromStorage().then(renderAgendas);
 });

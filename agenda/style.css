@@ -39,11 +39,12 @@ body {
   border-radius: 4px;
   background: #707070;
   color: #fff;
+  cursor: pointer;
   font: inherit;
 }
 
 .button:hover {
-  background: #fff;
+  background: #606060;
 }
 
 .user-area,
