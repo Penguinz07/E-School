@@ -62,6 +62,9 @@
       background: #fff !important;
       color: #222 !important;
     }
+    body.light-theme .storage-status {
+      color: #d9534f !important;
+    }
   `;
   document.head.appendChild(themeStyles);
 
