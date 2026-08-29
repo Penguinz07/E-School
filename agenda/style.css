@@ -34,14 +34,12 @@ body {
 }
 
 .button {
-  border: 0;
+  padding: 7px 9px;
+  border: 1px solid #aaa;
   border-radius: 4px;
-  padding: 8px 12px;
-  background: #e6e6e6;
-  color: #333;
-  cursor: pointer;
+  background: #707070;
+  color: #fff;
   font: inherit;
-  text-decoration: none;
 }
 
 .button:hover {
