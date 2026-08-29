@@ -51,7 +51,11 @@
           <p class="eyebrow">Now viewing</p>
           <h2 id="activeRoomName">Classroom</h2>
         </div>
-        <button id="leaveRoom" class="button secondary-button" type="button">Back to classrooms</button>
+        <div class="classroom-actions">
+          <button id="muteAllStudents" class="button secondary-button host-only" type="button" hidden>Mute all</button>
+          <button id="unmuteAllStudents" class="button host-only" type="button" hidden>Unmute all</button>
+          <button id="leaveRoom" class="button secondary-button" type="button">Back to classrooms</button>
+        </div>
       </div>
       <div id="meet" class="meet-frame"></div>
       <p id="status" class="status" aria-live="polite">Preparing the classroom...</p>

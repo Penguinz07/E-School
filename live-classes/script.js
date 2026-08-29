@@ -27,6 +27,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const classroom = document.getElementById('classroom');
   const meet = document.getElementById('meet');
   const activeRoomName = document.getElementById('activeRoomName');
+  const muteAllStudentsButton = document.getElementById('muteAllStudents');
+  const unmuteAllStudentsButton = document.getElementById('unmuteAllStudents');
   let rooms = [];
   let api;
   let activeRoom;
@@ -129,6 +131,28 @@ document.addEventListener('DOMContentLoaded', () => {
     await loadRooms();
   };
 
+  const muteEveryone = () => {
+    if (!api || !isHost) return;
+    try {
+      api.executeCommand('muteEveryone');
+      status.textContent = 'All students have been muted.';
+    } catch (error) {
+      console.error('Could not mute everyone:', error);
+      status.textContent = 'The classroom could not mute students.';
+    }
+  };
+
+  const unmuteEveryone = () => {
+    if (!api || !isHost) return;
+    try {
+      api.executeCommand('unmuteEveryone');
+      status.textContent = 'All students have been unmuted.';
+    } catch (error) {
+      console.error('Could not unmute everyone:', error);
+      status.textContent = 'The classroom could not unmute students.';
+    }
+  };
+
   const joinRoom = (room) => {
     if (typeof JitsiMeetExternalAPI === 'undefined') {
       status.textContent = 'The classroom service could not load. Check your connection and refresh.';
@@ -140,6 +164,8 @@ document.addEventListener('DOMContentLoaded', () => {
     clearInterval(roomStatusTimer);
     activeRoomName.textContent = room.room_name;
     meet.replaceChildren();
+    muteAllStudentsButton.hidden = !isHost;
+    unmuteAllStudentsButton.hidden = !isHost;
     const toolbarButtons = isHost
       ? ['microphone', 'camera', 'desktop', 'chat', 'raisehand', 'tileview', 'fullscreen']
       : ['microphone', 'fullscreen', 'raisehand', 'tileview', 'chat'];
@@ -219,12 +245,16 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('refreshRooms').addEventListener('click', loadRooms);
+  muteAllStudentsButton.addEventListener('click', muteEveryone);
+  unmuteAllStudentsButton.addEventListener('click', unmuteEveryone);
   document.getElementById('leaveRoom').addEventListener('click', () => {
     if (api) api.dispose();
     clearInterval(roomStatusTimer);
     activeRoom = undefined;
     classroom.hidden = true;
     roomDirectory.hidden = false;
+    muteAllStudentsButton.hidden = true;
+    unmuteAllStudentsButton.hidden = true;
     status.textContent = 'Choose a classroom to join.';
   });
 
