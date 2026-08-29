@@ -65,6 +65,10 @@
     body.light-theme .storage-status {
       color: #d9534f !important;
     }
+    body:not(.light-theme) .button {
+      color: #222 !important;
+    }
+
   `;
   document.head.appendChild(themeStyles);
 

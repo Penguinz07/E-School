@@ -465,11 +465,6 @@ document.addEventListener('DOMContentLoaded', () => {
     agendaDialog.close();
   });
 
-  logoutButton.addEventListener('click', () => {
-    ['loggedIn', 'username', 'role', 'section', 'sections'].forEach((key) => sessionStorage.removeItem(key));
-    window.location.href = '../login/login.html';
-  });
-
   [dateFilter, sectionFilter, subjectFilter].forEach((filter) => filter.addEventListener('change', renderAgendas));
 
   loadFromStorage().then(renderAgendas);
