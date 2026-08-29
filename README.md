@@ -9,7 +9,7 @@ This project was created to build practical experience in web development, impro
 We hope you enjoy exploring the project and find it both useful and interesting.
 
 ## Support
-For support, please contact: penguinz996@gmail.com
+For support, please contact: penguinz996@gmail.com , aliredaannan95@gmail.com
 
 ## Acknowledgement
-This project would not have been possible without the support and contribution of Chemist6612.
+This project would not have been possible without the support and contribution of [Chemist6612](https://github.com/Chemist6612).
